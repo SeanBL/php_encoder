@@ -1,4 +1,5 @@
 <?php
+
 global $sourceGltf;
 $sourceGltf = "gltfDemo\woolly-mammoth-100k-4096.gltf";
 $uID = 123;
@@ -22,9 +23,9 @@ $shuffleSq = array_rand(range(0,29), $USHF_MAX_LENGTH);
 //shuffle the array list
 shuffle($shuffleSq);
 //this is for testing purposes to confirm that each element is a unique value.
-foreach($shuffleSq as $value) {
-    echo "$value <br>";
-}
+// foreach($shuffleSq as $value) {
+//     echo "$value <br>";
+// }
 $encoded;
 
 //convert the BASE60 value to a unicode character
@@ -60,7 +61,7 @@ function b602Num($uniChar) {
 
 
 //Generate Token
-function encodeAndGenerateToken($uID, $ushf, $tsv) {
+function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
     global $UID_MAX_LENGTH;
     global $USHF_MAX_LENGTH;
     global $TIMESTAMP_MAX_LENGTH;
@@ -82,11 +83,11 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
         $token .= ".";
     }
     
-    echo "Token: $token <br>";
+    //echo "Token: $token <br>";
     
     // Write symbols representing UID decimals one by one into formerly randomly chosen positions.
     $tempUID = str_pad($uID, $UID_MAX_LENGTH, "0", STR_PAD_LEFT);
-    echo "Temp UID: $tempUID <br>";
+    //echo "Temp UID: $tempUID <br>";
     for ($i = 0; $i < $UID_MAX_LENGTH; $i++) {
         $newToken = substr($token, 0, $headerLength + $idxs[$i]); 
         $newToken .= num2B60(substr($tempUID, -1) + (rand(0, 5) * 10));
@@ -95,8 +96,8 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
         //Don't understand this.
         $tempUID = substr($tempUID, 0, -1);
     }
-    echo "Temp UID: $tempUID <br>";
-    echo "<br>$token <br>";
+    //echo "Temp UID: $tempUID <br>";
+    //echo "<br>$token <br>";
 
     //Write symbols representing a unique Shuffling sequence for this particular user. 
     $idxOffSet = $UID_MAX_LENGTH;
@@ -106,7 +107,7 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
         $newToken .= substr($token, $headerLength + $idxs[$i + $idxOffSet] + 1);
         $token = $newToken;
     }
-    echo "Token: $token <br>";
+    //echo "Token: $token <br>";
 
     //Write symbols representing Timestamp decimals.
     $idxOffSet += $USHF_MAX_LENGTH;
@@ -119,8 +120,8 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
         $token = $newToken;
         $thisMomentTemp = substr($thisMomentTemp, 0, -1);
     }
-    echo "This Moment Temp: $thisMomentTemp <br>";
-    echo "New Token: $newToken <br>";
+    //echo "This Moment Temp: $thisMomentTemp <br>";
+    //echo "New Token: $newToken <br>";
 
     //Write symbols representing Timestamp validity decimals.
     $idxOffSet += $UID_MAX_LENGTH;
@@ -132,7 +133,7 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
         $token = $newToken;
         $tsvTemp = substr($tsvTemp, 0, -1);
     }
-    echo "Token: $token <br>";
+    //echo "Token: $token <br>";
 
     //Fill the remaining blank spaces with random-generated BASE60 symbols.
     for ($i = $headerLength; $i < strlen($token); $i++) {
@@ -143,7 +144,7 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
             $token = $newToken;
         }
     }
-    echo "Token: $token <br>";
+    //echo "Token: $token <br>";
 
     //Empty shuffling matrix with 6 rows and 5 columns.
     $shMat = array(
@@ -156,68 +157,85 @@ function encodeAndGenerateToken($uID, $ushf, $tsv) {
     );
 
     //Update the source GLTF file by adding zeros to the count value in the accessors.
-    global $sourceGltf;
-    $gltfContents = file_get_contents($sourceGltf);
-    $data = json_decode($gltfContents, true);
+    
+    $sGltfContents = file_get_contents($sourceGltf);
+    $data = json_decode($sGltfContents, true);
 
     // Fill buffer length with zeros
     $sEncKey = str_pad($data["accessors"][0]["count"], $USHF_MAX_LENGTH, 0, STR_PAD_LEFT);
     $data['accessors'][0]['count'] = $sEncKey;
     $updatedGltf = json_encode($data, JSON_PRETTY_PRINT);
     file_put_contents($sourceGltf, $updatedGltf);
-    echo "<br>";
-    echo file_get_contents($sourceGltf);
+    //echo "<br>";
+    //echo file_get_contents($sourceGltf);
     
     //Write hidden key digits into the shuffling matrix.
     $shOffsetList = array();
     for ($i = 0; $i < $USHF_MAX_LENGTH; $i++) {
-        $shOffset = b602Num($token[$headerLength + b602Num($token[$i + $UID_MAX_LENGTH])]) %30;
-        echo "<br> Shuffle Off Set: $shOffset <br>";
+        $shOffset = b602Num($token[$headerLength + b602Num($token[$i + $UID_MAX_LENGTH])]) % 30;
         array_push($shOffsetList, $shOffset);
         $shMat[floor($shOffset / 5)][$shOffset % 5] = intval($sEncKey[$i]);
     }
-    echo "<br>";
-    echo $shMat[0][0];
-    echo $shMat[0][1];
-    echo $shMat[0][2];
-    echo $shMat[0][3];
-    echo $shMat[0][4];
-    echo "<br>";
-    echo $shMat[1][0];
-    echo $shMat[1][1];
-    echo $shMat[1][2];
-    echo $shMat[1][3];
-    echo $shMat[1][4];
-    echo "<br>";
-    echo $shMat[2][0];
-    echo $shMat[2][1];
-    echo $shMat[2][2];
-    echo $shMat[2][3];
-    echo $shMat[2][4];
-    echo "<br>";
-    echo $shMat[3][0];
-    echo $shMat[3][1];
-    echo $shMat[3][2];
-    echo $shMat[3][3];
-    echo $shMat[3][4];
-    echo "<br>";
-    echo $shMat[4][0];
-    echo $shMat[4][1];
-    echo $shMat[4][2];
-    echo $shMat[4][3];
-    echo $shMat[4][4];
-    echo "<br>";
-    echo $shMat[5][0];
-    echo $shMat[5][1];
-    echo $shMat[5][2];
-    echo $shMat[5][3];
-    echo $shMat[5][4];
     
+    //Fill unused spaces in shuffling matrix with random decimals.
+    for ($i = 0; $i < $SHFL_MATRIX_SIZE; $i++) {
+        if(!in_array($i, $shOffsetList)) {
+            $shMat[floor($i / 5)][$i % 5] = rand(0,9);
+        }
+    }
 
+    // for ($i = 0; $i < 6; $i++) {
+    //     echo "<br>";
+    //     for ($j = 0; $j < 5; $j++) {
+    //         echo $shMat[$i][$j];
+    //     }
+    // }
+
+    $egltf = $sourceGltf;
+
+    $eGltfContents = file_get_contents($egltf);
+    $eGltfData = json_decode($eGltfContents, true);
+    for ($i = 0; $i < 3; $i++) {
+        $eGltfData['accessors'][$i]['count'] = 1;
+    }
+
+    $sGltfContents = file_get_contents($sourceGltf);
+    $sGltfData = json_decode($sGltfContents, true);
+    //echo "<br> SourceGLTF: $sGltfContents <br>";
+    for ($i = 0; $i < 3; $i++) {
+        $sVal = strval($sGltfData['accessors'][0]['max'][$i]);
+        $sEncVal = substr($sVal, 0, -6);
+        for ($j = 0; $j < 5; $j++) {
+            $sEncVal .= strval($shMat[$i][$j]);
+        }
+        $sEncVal .= substr($sVal, -1);
+        //echo "string encrypted value: $sEncVal <br>";
+        $eGltfData['accessors'][0]['max'][$i] = floatval($sEncVal);
+    }
+
+    for ($i = 0; $i < 3; $i++) {
+        $sVal = strval($sGltfData['accessors'][0]['min'][$i]);
+        $sEncVal = substr($sVal, 0, -6);
+        for ($j = 0; $j < 5; $j++) {
+            $sEncVal .= strval($shMat[$i + 3][$j]);
+        }
+        $sEncVal .= substr($sVal, -1);
+        $eGltfData['accessors'][0]['min'][$i] = floatval($sEncVal);
+    }
+
+    $updatedEGltf = json_encode($eGltfData, JSON_PRETTY_PRINT);
+    file_put_contents($egltf, $updatedEGltf);
+    //echo "<br>Encrypted GLTF:";
+    $egltfGet = file_get_contents($egltf);
+    //echo $egltfGet;
+    $egltfDec = json_decode($egltfGet);
+    $egltfEnc = json_encode($egltfDec);
+    
+    //return array($egltf, $token);
+    return $egltfEnc;
 
 }
 $tempArry = array(4, 12, 14, 0, 2, 17, 3, 20, 22, 16);
-encodeAndGenerateToken(477, $tempArry, 123);
-
+echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
 
 ?>

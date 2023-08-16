@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Encoder/Decoder Test</title>
+</head>
+<body>
+    <p id="message"></p>
+    <button id="fetchButton">Fetch GLTF</button>
+
+    <script>
+        var messageElement = document.getElementById("message");
+        var fetchButton = document.getElementById("fetchButton");
+
+        fetchButton.addEventListener("click", function() {
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function() {
+                const myArr = JSON.parse(this.responseText);
+                document.getElementById("message").innerHTML = myArr["accessors"][0]['max'][0];
+                console.log(myArr["accessors"][0]['max'][0]);
+
+                
+            };
+            
+            xhr.open("PUT", "index.php", true);
+            xhr.send();
+        });
+    </script>
+</body>
+
+</html>
