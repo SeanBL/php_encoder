@@ -74,7 +74,7 @@ function decodeGltfAndToken(egltf, etkn) {
     // Decode user ID.
     let decUID = "";
     for (let i = 0; i < UID_MAX_LENGTH; i++) {
-        let uidDec = String(parseInt(b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i))))) % 10);
+        let uidDec = String(b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i)))) % 10);
         decUID += uidDec;
     }
     
