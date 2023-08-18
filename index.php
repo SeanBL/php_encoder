@@ -144,7 +144,7 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
             $token = $newToken;
         }
     }
-    //echo "Token: $token <br>";
+    echo "Token: $token <br>";
 
     //Empty shuffling matrix with 6 rows and 5 columns.
     $shMat = array(
@@ -225,9 +225,9 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
 
     $updatedEGltf = json_encode($eGltfData, JSON_PRETTY_PRINT);
     file_put_contents($egltf, $updatedEGltf);
-    //echo "<br>Encrypted GLTF:";
+    echo "<br>Encrypted GLTF:";
     $egltfGet = file_get_contents($egltf);
-    //echo $egltfGet;
+    echo $egltfGet;
     $egltfDec = json_decode($egltfGet);
     $egltfEnc = json_encode($egltfDec);
     
@@ -236,6 +236,53 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
 
 }
 $tempArry = array(4, 12, 14, 0, 2, 17, 3, 20, 22, 16);
-echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+
+
+
+
+// Check if the request method is PUT
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    // Get the JSON data from the request body
+    $json_data = file_get_contents("php://input");
+    
+    // Check if JSON data was received
+    if ($json_data !== false) {
+        // Decode the JSON data into an associative array
+        //$data = json_decode($json_data, true);
+        $data = $json_data;
+        
+        if ($data !== null) {
+            // Process the received JSON data
+            // For example, you can access the values using $data['key']
+            
+            // Send a response (you can customize this part)
+            $response = array('status' => 'success', 'message' => 'JSON data received and processed');
+            header('Content-Type: application/json');
+            //echo json_encode($response);
+            echo $data . "0000";
+        } else {
+            // Invalid JSON data
+            header('HTTP/1.1 400 Bad Request');
+            echo "Invalid JSON data";
+        }
+    } else {
+        // No data received
+        header('HTTP/1.1 400 Bad Request');
+        echo "No data received";
+    }
+} else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+    
+} else {
+    // Invalid request method
+    header('HTTP/1.1 405 Method Not Allowed');
+    echo "Method Not Allowed";
+}
+
+
+
+
+
+//echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
 
 ?>

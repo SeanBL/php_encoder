@@ -7,53 +7,53 @@
     <p id="message"></p>
     <button id="fetchButton">Fetch Message</button>
 
-    <script>
-        var messageElement = document.getElementById("message");
-        var fetchButton = document.getElementById("fetchButton");
-        const UID_MAX_LENGTH = 10;
-        const USHF_MAX_LENGTH = 10;
-        const TIMESTAMP_MAX_LENGTH = 10;
-        const TIMESTAMP_VALIDITY_MAX_LENGTH = 10;
-        const SHFL_MATRIX_SIZE = 6 * 5;
+    <script src="decode.js">
+        // var messageElement = document.getElementById("message");
+        // var fetchButton = document.getElementById("fetchButton");
+        // const UID_MAX_LENGTH = 10;
+        // const USHF_MAX_LENGTH = 10;
+        // const TIMESTAMP_MAX_LENGTH = 10;
+        // const TIMESTAMP_VALIDITY_MAX_LENGTH = 10;
+        // const SHFL_MATRIX_SIZE = 6 * 5;
 
-        let egltf = 'C:\Users\seanb\Desktop\egltf\woolly-mammoth-100k-4096.gltf';
-        console.log(egltf["accessors"]);
+        // let egltf = 'C:\Users\seanb\Desktop\egltf\woolly-mammoth-100k-4096.gltf';
+        // console.log(egltf["accessors"]);
 
-        const charList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789';
-        function b602num(asc) {
-            if (charList.includes(asc)) {
-                console.log("Base60 decoder received symbol out of range: " + asc);
-            } else {
-                let num = asc.charCodeAt();
-                if (num >= 97) {
-                    return num - 97 + 26;
-                } else if (num >= 65) {
-                    return num - 65;
-                } else {
-                    return num - 59 + 52;
-                }
-            }
-        }
+        // const charList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789';
+        // function b602num(asc) {
+        //     if (charList.includes(asc)) {
+        //         console.log("Base60 decoder received symbol out of range: " + asc);
+        //     } else {
+        //         let num = asc.charCodeAt();
+        //         if (num >= 97) {
+        //             return num - 97 + 26;
+        //         } else if (num >= 65) {
+        //             return num - 65;
+        //         } else {
+        //             return num - 59 + 52;
+        //         }
+        //     }
+        // }
         
-        let etkn = "7KkbgcjlZdJuaiyRrBhFN2XmpMU4eTqQ5AHUOIfjisUvQvd9Wtq2g6LfRHu4KyKUA6GeqhAsy5orAheOE2IJyRgh5TfkbMlc";
+        // let etkn = "7KkbgcjlZdJuaiyRrBhFN2XmpMU4eTqQ5AHUOIfjisUvQvd9Wtq2g6LfRHu4KyKUA6GeqhAsy5orAheOE2IJyRgh5TfkbMlc";
 
-        function decodeGltfAndToken(egltf, etkn) {
-            const headerLength = UID_MAX_LENGTH + USHF_MAX_LENGTH + TIMESTAMP_MAX_LENGTH + TIMESTAMP_VALIDITY_MAX_LENGTH;
-            let unshOffsetList = [];
-            for (let i = 0; i < USHF_MAX_LENGTH; i++) {
-                let unshOffset = b602num(etkn.slice(headerLength + b602num(etkn.slice(i + UID_MAX_LENGTH)))) % 30;
-                unshOffsetList.push(unshOffset);
-            }
+        // function decodeGltfAndToken(egltf, etkn) {
+        //     const headerLength = UID_MAX_LENGTH + USHF_MAX_LENGTH + TIMESTAMP_MAX_LENGTH + TIMESTAMP_VALIDITY_MAX_LENGTH;
+        //     let unshOffsetList = [];
+        //     for (let i = 0; i < USHF_MAX_LENGTH; i++) {
+        //         let unshOffset = b602num(etkn.slice(headerLength + b602num(etkn.slice(i + UID_MAX_LENGTH)))) % 30;
+        //         unshOffsetList.push(unshOffset);
+        //     }
 
-            //Transcribe data from encoded GLTF into matrix form
-            let unshMatrix = [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]];
-            for (let i = 0; i < 3; i++) {
-                let encValStr = String(egltf["accessors"][0]["max"][i]);
-                let encVal = encValStr.slice(-6, -1);
-            }
+        //     //Transcribe data from encoded GLTF into matrix form
+        //     let unshMatrix = [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]];
+        //     for (let i = 0; i < 3; i++) {
+        //         let encValStr = String(egltf["accessors"][0]["max"][i]);
+        //         let encVal = encValStr.slice(-6, -1);
+        //     }
             
-        }
-        decodeGltfAndToken(egltf, etkn);
+        // }
+        // decodeGltfAndToken(egltf, etkn);
     </script>
 </body>
 
