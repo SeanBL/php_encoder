@@ -20,12 +20,11 @@ $SHFL_MATRIX_SIZE = 6 * 5;
 
 //Create unique list of ten integer values from a list of values ranging from 0 to 29.
 $shuffleSq = array_rand(range(0,29), $USHF_MAX_LENGTH);
-//shuffle the array list
 shuffle($shuffleSq);
 //this is for testing purposes to confirm that each element is a unique value.
-// foreach($shuffleSq as $value) {
-//     echo "$value <br>";
-// }
+foreach($shuffleSq as $value) {
+    echo "$value <br>";
+}
 $encoded;
 
 //convert the BASE60 value to a unicode character
@@ -227,7 +226,7 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
     file_put_contents($egltf, $updatedEGltf);
     echo "<br>Encrypted GLTF:";
     $egltfGet = file_get_contents($egltf);
-    echo $egltfGet;
+    //echo $egltfGet;
     $egltfDec = json_decode($egltfGet);
     $egltfEnc = json_encode($egltfDec);
     
@@ -252,10 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $data = $json_data;
         
         if ($data !== null) {
-            // Process the received JSON data
-            // For example, you can access the values using $data['key']
             
-            // Send a response (you can customize this part)
+            // Send a response
             $response = array('status' => 'success', 'message' => 'JSON data received and processed');
             header('Content-Type: application/json');
             //echo json_encode($response);
@@ -271,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         echo "No data received";
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+    //echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
     
 } else {
     // Invalid request method
@@ -283,6 +280,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 
 
-//echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
 
 ?>
