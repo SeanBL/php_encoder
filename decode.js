@@ -3,10 +3,10 @@ var fetchButton = document.getElementById("fetchButton");
 const UID_MAX_LENGTH = 10;
 const USHF_MAX_LENGTH = 10;
 const TIMESTAMP_MAX_LENGTH = 10;
-const TIMESTAMP_VALIDITY_MAX_LENGTH = 10;
+const TIMESTAMP_VALIDITY_MAX_LENGTH = 5;
 const SHFL_MATRIX_SIZE = 6 * 5;
 
-let egltf = '{ "accessors": [ { "bufferView": 0, "componentType": 5126, "count": 1, "max": [ 0.9607167317084, 1.7219889357621, 2.5408611578857 ], "min": [ -0.9601930200764, -1.7222570010063, -2.5406730318858 ], "type": "VEC3" }, { "bufferView": 1, "componentType": 5126, "count": 1, "type": "VEC3" }, { "bufferView": 2, "componentType": 5126, "count": 1, "type": "VEC2" }, { "bufferView": 3, "componentType": 5125, "count": 300000, "type": "SCALAR" } ], "asset": { "generator": "MeshSmith mesh conversion tool", "version": "2.0" }, "bufferViews": [ { "buffer": 0, "byteLength": 883056, "target": 34962 }, { "buffer": 0, "byteLength": 883056, "byteOffset": 883056, "target": 34962 }, { "buffer": 0, "byteLength": 588704, "byteOffset": 1766112, "target": 34962 }, { "buffer": 0, "byteLength": 1200000, "byteOffset": 2354816, "target": 34963 } ], "buffers": [ { "byteLength": 3554816, "uri": "woolly-mammoth-100k-4096.bin" } ], "images": [ { "uri": "woolly-mammoth-100k-4096-occlusion.jpg" }, { "uri": "woolly-mammoth-100k-4096-normals.jpg" } ], "materials": [ { "name": "default", "normalTexture": { "index": 1 }, "occlusionTexture": { "index": 0 }, "pbrMetallicRoughness": { "metallicFactor": 0.100000001490116, "roughnessFactor": 0.800000011920929 } } ], "meshes": [ { "primitives": [ { "attributes": { "NORMAL": 1, "POSITION": 0, "TEXCOORD_0": 2 }, "indices": 3, "material": 0, "mode": 4 } ] } ], "nodes": [ { "mesh": 0 } ], "scene": 0, "scenes": [ { "nodes": [ 0 ] } ], "textures": [ { "source": 0 }, { "source": 1 } ] }';
+let egltf = '{"accessors":[{"bufferView":0,"componentType":5126,"count":1,"max":[0.9607167317084,1.7219889198941,2.5408611968757],"min":[-0.9601930000524,-1.7222570020573,-2.5406730822498],"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC2"},{"bufferView":3,"componentType":5125,"count":300000,"type":"SCALAR"}],"asset":{"generator":"MeshSmith mesh conversion tool","version":"2.0"},"bufferViews":[{"buffer":0,"byteLength":883056,"target":34962},{"buffer":0,"byteLength":883056,"byteOffset":883056,"target":34962},{"buffer":0,"byteLength":588704,"byteOffset":1766112,"target":34962},{"buffer":0,"byteLength":1200000,"byteOffset":2354816,"target":34963}],"buffers":[{"byteLength":3554816,"uri":"woolly-mammoth-100k-4096.bin"}],"images":[{"uri":"woolly-mammoth-100k-4096-occlusion.jpg"},{"uri":"woolly-mammoth-100k-4096-normals.jpg"}],"materials":[{"name":"default","normalTexture":{"index":1},"occlusionTexture":{"index":0},"pbrMetallicRoughness":{"metallicFactor":0.100000001490116,"roughnessFactor":0.800000011920929}}],"meshes":[{"primitives":[{"attributes":{"NORMAL":1,"POSITION":0,"TEXCOORD_0":2},"indices":3,"material":0,"mode":4}]}],"nodes":[{"mesh":0}],"scene":0,"scenes":[{"nodes":[0]}],"textures":[{"source":0},{"source":1}]}';
 
 let egltfObj = JSON.parse(egltf);
 console.log(egltfObj);
@@ -20,7 +20,7 @@ function b602num(asc) {
         } else if (num >= 65) {
             return num - 65;
         } else {
-            return num - 59 + 52;
+            return num - 50 + 52;
         }
         
     } else {
@@ -28,7 +28,9 @@ function b602num(asc) {
     }
 }
 
-let etkn = "QLwshXqc93gu6T8kmOJoECMbUWe4NjyGdandQg6lpCTPqb7a6OfHJKDGkCoLOUOyLMxQocVCYAAEnAlUk2ZsU3DeK9NUURAc";
+
+
+let etkn = "EXpmuP2dS7UFKiGJzqbWlxQevtw4cCMTYL6JnLPH2vBxCyAhEFesYo2QZEHBTeqaKh8ORD9FPoBlOOJoseigroeKDxVKoBGb";
 
 function decodeGltfAndToken(egltf, etkn) {
     const headerLength = UID_MAX_LENGTH + USHF_MAX_LENGTH + TIMESTAMP_MAX_LENGTH + TIMESTAMP_VALIDITY_MAX_LENGTH;
@@ -120,6 +122,7 @@ function decodeGltfAndToken(egltf, etkn) {
     console.log(decGltf["accessors"][1]["count"]);
     console.log(decGltf["accessors"][2]["count"]);
 
+    return decGltf;
     
 }
 decodeGltfAndToken(egltfObj, etkn);

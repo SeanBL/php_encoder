@@ -22,9 +22,9 @@ $SHFL_MATRIX_SIZE = 6 * 5;
 $shuffleSq = array_rand(range(0,29), $USHF_MAX_LENGTH);
 shuffle($shuffleSq);
 //this is for testing purposes to confirm that each element is a unique value.
-foreach($shuffleSq as $value) {
-    echo "$value <br>";
-}
+// foreach($shuffleSq as $value) {
+//     echo "$value <br>";
+// }
 $encoded;
 
 //convert the BASE60 value to a unicode character
@@ -143,7 +143,7 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
             $token = $newToken;
         }
     }
-    echo "Token: $token <br>";
+    //echo "Token: $token <br>";
 
     //Empty shuffling matrix with 6 rows and 5 columns.
     $shMat = array(
@@ -224,14 +224,20 @@ function encodeAndGenerateToken($sourceGltf, $uID, $ushf, $tsv) {
 
     $updatedEGltf = json_encode($eGltfData, JSON_PRETTY_PRINT);
     file_put_contents($egltf, $updatedEGltf);
-    echo "<br>Encrypted GLTF:";
+    //echo "<br>Encrypted GLTF:";
     $egltfGet = file_get_contents($egltf);
     //echo $egltfGet;
     $egltfDec = json_decode($egltfGet);
     $egltfEnc = json_encode($egltfDec);
+
+    $testArray = json_encode(array("value1" => $egltfGet, "value2" => $token));
     
-    //return array($egltf, $token);
-    return $egltfEnc;
+    
+    //return $egltfGet;
+    //return $egltfEnc;
+    
+    return $testArray;
+    //return $testArray;
 
 }
 $tempArry = array(4, 12, 14, 0, 2, 17, 3, 20, 22, 16);
@@ -268,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         echo "No data received";
     }
 } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    //echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+    echo encodeAndGenerateToken($sourceGltf, 477, $shuffleSq, 123);
     
 } else {
     // Invalid request method
@@ -280,6 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 
 
-echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
+
+
+//echo encodeAndGenerateToken($sourceGltf, 477, $tempArry, 123);
 
 ?>

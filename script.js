@@ -1,43 +1,198 @@
-var responseText = "123234234";
-var messageElement = document.getElementById("message");
-var fetchButton = document.getElementById("fetchButton");
+//var responseText = "123234234";
+const UID_MAX_LENGTH = 10;
+const USHF_MAX_LENGTH = 10;
+const TIMESTAMP_MAX_LENGTH = 10;
+const TIMESTAMP_VALIDITY_MAX_LENGTH = 5;
+const SHFL_MATRIX_SIZE = 6 * 5;
 
-var xhr = new XMLHttpRequest();
+let egltf = '{"accessors":[{"bufferView":0,"componentType":5126,"count":1,"max":[0.9607167317084,1.7219889198941,2.5408611968757],"min":[-0.9601930000524,-1.7222570020573,-2.5406730822498],"type":"VEC3"},{"bufferView":1,"componentType":5126,"count":1,"type":"VEC3"},{"bufferView":2,"componentType":5126,"count":1,"type":"VEC2"},{"bufferView":3,"componentType":5125,"count":300000,"type":"SCALAR"}],"asset":{"generator":"MeshSmith mesh conversion tool","version":"2.0"},"bufferViews":[{"buffer":0,"byteLength":883056,"target":34962},{"buffer":0,"byteLength":883056,"byteOffset":883056,"target":34962},{"buffer":0,"byteLength":588704,"byteOffset":1766112,"target":34962},{"buffer":0,"byteLength":1200000,"byteOffset":2354816,"target":34963}],"buffers":[{"byteLength":3554816,"uri":"woolly-mammoth-100k-4096.bin"}],"images":[{"uri":"woolly-mammoth-100k-4096-occlusion.jpg"},{"uri":"woolly-mammoth-100k-4096-normals.jpg"}],"materials":[{"name":"default","normalTexture":{"index":1},"occlusionTexture":{"index":0},"pbrMetallicRoughness":{"metallicFactor":0.100000001490116,"roughnessFactor":0.800000011920929}}],"meshes":[{"primitives":[{"attributes":{"NORMAL":1,"POSITION":0,"TEXCOORD_0":2},"indices":3,"material":0,"mode":4}]}],"nodes":[{"mesh":0}],"scene":0,"scenes":[{"nodes":[0]}],"textures":[{"source":0},{"source":1}]}';
+console.log(egltf);
+let egltfO = JSON.parse(egltf);
+console.log(egltfO);
+
+const charList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789';
+function b602num(asc) {
+    if (charList.includes(asc)) {
+        let num = asc.charCodeAt();
+        if (num >= 97) {
+            return num - 97 + 26;
+        } else if (num >= 65) {
+            return num - 65;
+        } else {
+            return num - 50 + 52;
+        }
         
-xhr.onload = function() {
-    // this
-    const myArr = JSON.parse(this.responseText);
-    document.getElementById("message").innerHTML = myArr["accessors"][0]['max'][0];
-    console.log(myArr["accessors"][0]['max'][0]);
-
-    // call the function decode, passing the value in to be decoded
-
-    // As an analogy, it dynamically created the variable in the script block outside of all functions
-    //window.responseText = this.responseText;
-    
-};
-xhr.open("GET", "index.php", true);
-xhr.send();
-
-
-fetchButton.addEventListener("click", function() {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        console.log(this.responseText);
-    };
-    
-    xhr.open("PUT", "index.php", true);
-    xhr.send(0.47384738);
-});
-
-function init() {
-
-    //var responseText = "askhfsdk"
-    console.log(responseText)
-    setTimeout(()=>{
-        console.log("**** Outside of onload ****")
-        console.log(responseText)
-    },2000)
+    } else {
+        console.log("Base60 decoder received symbol out of range: " + asc);
+    }
 }
 
-init();
+
+
+let etkn = "EXpmuP2dS7UFKiGJzqbWlxQevtw4cCMTYL6JnLPH2vBxCyAhEFesYo2QZEHBTeqaKh8ORD9FPoBlOOJoseigroeKDxVKoBGb";
+
+function decodeGltfAndToken(egltf, etkn) {
+    const headerLength = UID_MAX_LENGTH + USHF_MAX_LENGTH + TIMESTAMP_MAX_LENGTH + TIMESTAMP_VALIDITY_MAX_LENGTH;
+    let unshOffsetList = [];
+    for (let i = 0; i < USHF_MAX_LENGTH; i++) {
+        let unshOffset = b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i + UID_MAX_LENGTH)))) % 30;
+        unshOffsetList.push(unshOffset);
+    }
+
+    //Transcribe data from encoded GLTF into matrix form
+    let unshMatrix = [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]];
+    for (let i = 0; i < 3; i++) {
+        let encValStr = String(egltf["accessors"][0]["max"][i]);
+        let encVal = encValStr.slice(-6, -1);
+        for (let j = 0; j < 5; j++) {
+            unshMatrix[i][j] = encVal.charAt(j);
+        }
+    }
+
+    for (let i = 0; i < 3; i++) {
+        let encValStr = String(egltf["accessors"][0]["min"][i]);
+        let encVal = encValStr.slice(-6, -1);
+        for (let j = 0; j < 5; j++) {
+            unshMatrix[i + 3][j] = encVal.charAt(j);
+        }
+    }
+
+    for (let i = 0; i < 6; i++) {
+        
+        for (let j = 0; j < 5; j++) {
+            console.log(unshMatrix[i][j]);
+        }
+    }
+
+    //Extract matrix shuffling offsets from token and reconstruct the missing key value.
+    let decKey = "";
+    for (let i = 0; i < USHF_MAX_LENGTH; i++) {
+        decKey += String(unshMatrix[Math.floor(unshOffsetList[i] / 5)][unshOffsetList[i] % 5]);
+    }
+    decKey = String(parseInt(decKey));
+    console.log(decKey);
+    
+    // Decode user ID.
+    let decUID = "";
+    for (let i = 0; i < UID_MAX_LENGTH; i++) {
+        let uidDec = String(b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i)))) % 10);
+        decUID += uidDec;
+    }
+    
+    console.log(decUID);
+    // Reverse the string function.
+    function reverseString(str) {
+        let splitString = str.split("");
+        let reverseString = splitString.reverse();
+        let joinString = reverseString.join("");
+        return joinString;
+    }
+    let newDecUID = reverseString(decUID);
+    console.log(newDecUID);
+    newDecUID = String(parseInt(newDecUID));
+    console.log(newDecUID);
+
+    // Decode UNIX timestamp.
+    let decTstp = '';
+    for (let i = 0; i < TIMESTAMP_MAX_LENGTH; i++) {
+        let tstpDec = String(b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i + UID_MAX_LENGTH + USHF_MAX_LENGTH)))) % 10);
+        decTstp += tstpDec;
+    }
+    let newDecTstp = reverseString(decTstp);
+    newDecTstp = String(parseInt(newDecTstp));
+    console.log(newDecTstp);
+
+    // Decode UNIX timestamp validity interval.
+    let decTstpVal = '';
+    for (let i = 0; i < TIMESTAMP_VALIDITY_MAX_LENGTH; i++) {
+        let tstpValDec = String(b602num(etkn.charAt(headerLength + b602num(etkn.charAt(i + UID_MAX_LENGTH + USHF_MAX_LENGTH + TIMESTAMP_MAX_LENGTH)))) % 10);
+        decTstpVal += tstpValDec;
+    }
+    let newDecTstpVal = reverseString(decTstpVal);
+    newDecTstpVal = String(parseInt(newDecTstpVal));
+    console.log(newDecTstpVal);
+
+    console.log(egltf);
+    let decGltf = egltf;
+    decGltf["accessors"][0]["count"] = parseInt(decKey);
+    decGltf["accessors"][1]["count"] = parseInt(decKey);
+    decGltf["accessors"][2]["count"] = parseInt(decKey);
+
+    console.log(decGltf["accessors"][0]["count"]);
+    console.log(decGltf["accessors"][1]["count"]);
+    console.log(decGltf["accessors"][2]["count"]);
+    
+    console.log(decGltf);
+
+    return decGltf;
+    
+}
+
+
+var messageElement = document.getElementById("message");
+var fetchButton = document.getElementById("fetchButton");
+var animation = document.getElementById("animation");
+
+
+animation.addEventListener("click", function() {
+    var xhr = new XMLHttpRequest();
+
+    xhr.onload = function() {
+        let returnArray = this.responseText;
+        let arrayParsed = JSON.parse(returnArray);
+        let gltfParsed = JSON.parse(arrayParsed.value1);
+        let token = arrayParsed.value2;
+        
+        let test = decodeGltfAndToken(gltfParsed, token);
+        console.log(gltfParsed);
+        console.log(test);
+        //console.log(gltfParsed[1]);
+        //console.log(gltfParsed['accessors'][0]);
+        
+    };
+    
+    xhr.open('GET', "index.php", true);
+    xhr.send();
+});
+
+
+
+// var xhr = new XMLHttpRequest();
+        
+// xhr.onload = function() {
+//     // this
+//     const myArr = JSON.parse(this.responseText);
+//     document.getElementById("message").innerHTML = myArr["accessors"][0]['max'][0];
+//     console.log(myArr["accessors"][0]['max'][0]);
+
+//     // call the function decode, passing the value in to be decoded
+
+//     // As an analogy, it dynamically created the variable in the script block outside of all functions
+//     //window.responseText = this.responseText;
+    
+// };
+// xhr.open("GET", "index.php", true);
+// xhr.send();
+
+
+// fetchButton.addEventListener("click", function() {
+//     var xhr = new XMLHttpRequest();
+//     xhr.onload = function() {
+//         console.log(this.responseText);
+//     };
+    
+//     xhr.open("PUT", "index.php", true);
+//     xhr.send(0.47384738);
+// });
+
+// function init() {
+
+//     //var responseText = "askhfsdk"
+//     console.log(responseText)
+//     setTimeout(()=>{
+//         console.log("**** Outside of onload ****")
+//         console.log(responseText)
+//     },2000)
+// }
+
+// init();
